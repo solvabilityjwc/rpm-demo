@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rate & Pricing Model — Solvability</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Serif+Display&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0f1f3d;
+    --navy-mid: #1a2f54;
+    --teal: #1a8a8a;
+    --teal-light: #2ab5b5;
+    --cream: #F5F5F2;
+    --silver: #a8b8cc;
+    --white: #ffffff;
+    --text: #0f1f3d;
+    --text-muted: #5a6a7e;
+    --border: rgba(15,31,61,0.12);
+    --card-bg: #ffffff;
+    --section-bg: #f7f9fc;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--cream);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--navy);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .site-header .brand {
+    font-family: 'DM Serif Display', serif;
+    color: var(--white);
+    font-size: 1.2rem;
+    letter-spacing: 0.01em;
+  }
+  .site-header .brand span { color: var(--teal-light); }
+  .header-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--silver);
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--navy);
+    color: var(--white);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(26,138,138,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal-light);
+    margin-bottom: 1.25rem;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    line-height: 1.15;
+    margin-bottom: 1.25rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--teal-light);
+  }
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--silver);
+    max-width: 560px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+  .demo-badge {
+    display: inline-block;
+    background: rgba(42,181,181,0.15);
+    border: 1px solid rgba(42,181,181,0.35);
+    color: var(--teal-light);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.85rem;
+    border-radius: 100px;
+    margin-bottom: 2rem;
+  }
+
+  /* CONTAINER */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* SECTION */
+  .section {
+    padding: 3.5rem 0;
+  }
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.5rem;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    color: var(--navy);
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+  .section-desc {
+    color: var(--text-muted);
+    max-width: 600px;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+
+  /* COMPANY CARD */
+  .company-card {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 2rem 2.5rem;
+    color: var(--white);
+    margin-bottom: 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .company-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 0.25rem;
+  }
+  .company-meta {
+    font-size: 0.85rem;
+    color: var(--silver);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  .company-meta span::before { content: '· '; }
+  .company-meta span:first-child::before { content: ''; }
+  .ssc-badge {
+    background: var(--teal);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  /* RATE CARDS */
+  .rate-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .rate-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .rate-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--teal);
+  }
+  .rate-card.fee::after { background: var(--navy); }
+  .rate-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+  .rate-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.25rem;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .rate-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* WRAP RATE STACK */
+  .stack-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .stack-header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 1rem 1.5rem;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: grid;
+    grid-template-columns: 1fr 100px 100px;
+    gap: 1rem;
+  }
+  .stack-header span:not(:first-child) { text-align: right; }
+  .stack-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px;
+    gap: 1rem;
+    padding: 0.9rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    transition: background 0.15s;
+  }
+  .stack-row:hover { background: #f7f9fc; }
+  .stack-row:last-child { border-bottom: none; }
+  .stack-row.total {
+    background: #f0f4f8;
+    font-weight: 600;
+  }
+  .stack-row.result {
+    background: var(--navy);
+    color: var(--white);
+    font-weight: 600;
+  }
+  .stack-name { font-size: 0.9rem; color: var(--text); }
+  .stack-row.result .stack-name { color: var(--white); }
+  .stack-pill {
+    display: inline-block;
+    background: rgba(26,138,138,0.1);
+    color: var(--teal);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+    margin-left: 0.5rem;
+  }
+  .stack-rate { text-align: right; font-size: 0.9rem; color: var(--text-muted); }
+  .stack-amount { text-align: right; font-size: 0.9rem; font-weight: 500; }
+  .stack-row.result .stack-rate,
+  .stack-row.result .stack-amount { color: var(--teal-light); }
+  .stack-row.result .stack-amount {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: var(--white);
+  }
+
+  /* SIE TABLE */
+  .sie-section { background: var(--section-bg); padding: 3.5rem 0; }
+  .pool-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .pool-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+  }
+  .pool-name {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.75rem;
+  }
+  .pool-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .pool-row:last-child { border-bottom: none; font-weight: 600; }
+  .pool-row .label { color: var(--text-muted); }
+  .pool-row .value { font-weight: 500; color: var(--navy); }
+  .pool-row:last-child .value { color: var(--teal); font-family: 'DM Serif Display', serif; font-size: 1rem; }
+
+  /* LABOR TABLE */
+  .labor-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    background: var(--card-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .labor-table th {
+    background: var(--navy);
+    color: var(--white);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .labor-table th:not(:first-child) { text-align: right; }
+  .labor-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .labor-table td:not(:first-child) { text-align: right; color: var(--text-muted); }
+  .labor-table tr:last-child td { border-bottom: none; font-weight: 600; background: #f0f4f8; }
+  .labor-table tr:last-child td:not(:first-child) { color: var(--navy); }
+  .labor-table tr:hover:not(:last-child) td { background: #f7f9fc; }
+  .charge-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    margin-left: 0.25rem;
+  }
+  .charge-d { background: rgba(26,138,138,0.1); color: var(--teal); }
+  .charge-g { background: rgba(15,31,61,0.08); color: var(--navy); }
+  .charge-o { background: rgba(168,184,204,0.3); color: #4a5a6a; }
+
+  /* ERROR MATH */
+  .error-section { background: var(--navy); color: var(--white); padding: 3.5rem 0; }
+  .error-section .section-title { color: var(--white); }
+  .error-section .section-desc { color: var(--silver); }
+  .error-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .error-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 1.5rem;
+  }
+  .error-card.danger { border-color: rgba(208,59,59,0.4); background: rgba(208,59,59,0.08); }
+  .error-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--silver); margin-bottom: 0.5rem; }
+  .error-card.danger .error-label { color: #f09595; }
+  .error-value { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--white); }
+  .error-card.danger .error-value { color: #f09595; }
+  .error-sub { font-size: 0.8rem; color: var(--silver); margin-top: 0.25rem; }
+  .error-callout {
+    background: rgba(42,181,181,0.12);
+    border: 1px solid rgba(42,181,181,0.3);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    font-size: 0.95rem;
+    color: var(--teal-light);
+    line-height: 1.6;
+  }
+  .error-callout strong { color: var(--white); }
+
+  /* CTA */
+  .cta-section { padding: 4rem 0; text-align: center; }
+  .cta-section .section-title { margin-bottom: 0.75rem; }
+  .cta-section .section-desc { margin-left: auto; margin-right: auto; margin-bottom: 2rem; }
+  .cta-btn {
+    display: inline-block;
+    background: var(--teal);
+    color: var(--white);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 1rem 2.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.15s;
+    margin-bottom: 1rem;
+  }
+  .cta-btn:hover { background: var(--teal-light); transform: translateY(-1px); }
+  .cta-sub {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 0.75rem;
+  }
+  .watermark {
+    font-size: 0.78rem;
+    color: var(--silver);
+    text-align: center;
+    padding: 1rem 0 0.5rem;
+    border-top: 1px solid var(--border);
+    margin-top: 1rem;
+  }
+
+  /* FOOTER */
+  .site-footer {
+    background: var(--navy);
+    color: var(--silver);
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.82rem;
+  }
+  .site-footer a { color: var(--teal-light); text-decoration: none; }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  @media (max-width: 640px) {
+    .rate-grid { grid-template-columns: 1fr; }
+    .pool-grid { grid-template-columns: 1fr; }
+    .error-grid { grid-template-columns: 1fr; }
+    .company-card { grid-template-columns: 1fr; }
+    .stack-header, .stack-row { grid-template-columns: 1fr 80px 80px; }
+    .labor-table th:nth-child(3),
+    .labor-table th:nth-child(4),
+    .labor-table td:nth-child(3),
+    .labor-table td:nth-child(4) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="brand">Solvability<span>.</span></div>
+  <div class="header-tag">Rate & Pricing Model — Demo</div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="demo-badge">Live Demo — Solvability Systems Corporation</div>
+  <p class="hero-eyebrow">Rate & Pricing Model · RPM</p>
+  <h1>This is what it looks like when you <em>know your numbers.</em></h1>
+  <p class="hero-sub">The RPM is your complete financial model — indirect rates, wrap rate, labor utilization, and pricing power, all in one place. This is a real model built on a fictional company so you can see exactly what yours would look like.</p>
+</section>
+
+<!-- COMPANY -->
+<section class="section">
+  <div class="container">
+    <p class="section-label">Demo Company</p>
+    <h2 class="section-title">Solvability Systems Corporation</h2>
+    <p class="section-desc">A fictional federal IT services contractor used to demonstrate the RPM. Every number below comes from a real model structure — the same structure built for actual clients.</p>
+
+    <div class="company-card">
+      <div>
+        <div class="company-name">Solvability Systems Corporation</div>
+        <div style="color: var(--teal-light); font-size: 0.85rem; margin-bottom: 0.5rem;">SSC · Federal IT & Cybersecurity Services</div>
+        <div class="company-meta">
+          <span>29 Employees</span>
+          <span>$5.7M Revenue</span>
+          <span>7 Active Contracts</span>
+          <span>Cost Plus · T&M · Fixed Price</span>
+        </div>
+      </div>
+      <div class="ssc-badge">DEMO MODEL</div>
+    </div>
+
+    <!-- INDIRECT RATES -->
+    <p class="section-label">Indirect Rates</p>
+    <h2 class="section-title" style="font-size: 1.35rem; margin-bottom: 0.5rem;">Where your wrap rate comes from</h2>
+    <p class="section-desc">These three rates — calculated from your actual Profit & Loss — are the inputs that drive everything else. Most contractors guess. The RPM calculates.</p>
+
+    <div class="rate-grid">
+      <div class="rate-card">
+        <div class="rate-label">Fringe Rate</div>
+        <div class="rate-value">21.58%</div>
+        <div class="rate-desc">Benefits, payroll taxes, leave — applied to direct labor</div>
+      </div>
+      <div class="rate-card">
+        <div class="rate-label">Overhead Rate</div>
+        <div class="rate-value">2.00%</div>
+        <div class="rate-desc">Technical support costs applied to direct labor + fringe</div>
+      </div>
+      <div class="rate-card fee">
+        <div class="rate-label">G&A Rate</div>
+        <div class="rate-value">12.00%</div>
+        <div class="rate-desc">Executive, accounting, legal — applied to total cost base</div>
+      </div>
+    </div>
+
+    <!-- WRAP RATE STACK -->
+    <p class="section-label" style="margin-top: 2.5rem;">Wrap Rate Stack</p>
+    <h2 class="section-title" style="font-size: 1.35rem; margin-bottom: 0.5rem;">Built on $1.00 of direct labor</h2>
+    <p class="section-desc">Every layer stacks on the one before it. Miss one and you're losing money on every hour you bill.</p>
+
+    <div class="stack-card">
+      <div class="stack-header">
+        <span>Layer</span>
+        <span>Rate</span>
+        <span>Amount</span>
+      </div>
+      <div class="stack-row">
+        <div class="stack-name">Direct Labor <span class="stack-pill">Base</span></div>
+        <div class="stack-rate">—</div>
+        <div class="stack-amount">1.0000</div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-name">Fringe <span class="stack-pill">Layer 2</span></div>
+        <div class="stack-rate">21.58%</div>
+        <div class="stack-amount">0.2158</div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-name">Overhead <span class="stack-pill">Layer 3</span></div>
+        <div class="stack-rate">2.00%</div>
+        <div class="stack-amount">0.0243</div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-name">G&A <span class="stack-pill">Layer 4</span></div>
+        <div class="stack-rate">12.00%</div>
+        <div class="stack-amount">0.1488</div>
+      </div>
+      <div class="stack-row total">
+        <div class="stack-name">Fully Burdened Labor Cost</div>
+        <div class="stack-rate">—</div>
+        <div class="stack-amount">1.3889</div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-name">Fee <span class="stack-pill">Layer 5</span></div>
+        <div class="stack-rate">8.00%</div>
+        <div class="stack-amount">0.1111</div>
+      </div>
+      <div class="stack-row result">
+        <div class="stack-name">Wrap Rate Multiplier</div>
+        <div class="stack-rate">—</div>
+        <div class="stack-amount">1.5000</div>
+      </div>
+    </div>
+
+    <div style="background: rgba(26,138,138,0.08); border: 1px solid rgba(26,138,138,0.2); border-radius: 10px; padding: 1.25rem 1.5rem; font-size: 0.9rem; color: var(--navy); line-height: 1.6;">
+      <strong>What this means for pricing:</strong> An employee earning $50/hr should bill at $75.00. Know your candidate's pay rate and you know instantly whether you can afford them on this contract — before you make the offer.
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SIE -->
+<section class="sie-section">
+  <div class="container">
+    <p class="section-label">Statement of Indirect Expenses</p>
+    <h2 class="section-title">Where the rates actually come from</h2>
+    <p class="section-desc">The indirect rates above are not guesses or industry averages. They are calculated directly from SSC's Profit & Loss — pool divided by base, every time.</p>
+
+    <div class="pool-grid">
+      <div class="pool-card">
+        <div class="pool-name">Fringe Pool</div>
+        <div class="pool-row"><span class="label">PTO & Holiday</span><span class="value">$343,616</span></div>
+        <div class="pool-row"><span class="label">Social Security</span><span class="value">$292,640</span></div>
+        <div class="pool-row"><span class="label">Group Health</span><span class="value">$220,200</span></div>
+        <div class="pool-row"><span class="label">Medicare</span><span class="value">$68,440</span></div>
+        <div class="pool-row"><span class="label">Other Fringe</span><span class="value">$1,932</span></div>
+        <div class="pool-row"><span class="label">Pool Total</span><span class="value">$926,829</span></div>
+        <div class="pool-row"><span class="label">Base (Direct Labor)</span><span class="value">$4,295,200</span></div>
+        <div class="pool-row"><span class="label">Rate</span><span class="value">21.58%</span></div>
+      </div>
+      <div class="pool-card">
+        <div class="pool-name">Overhead Pool</div>
+        <div class="pool-row"><span class="label">OH Labor</span><span class="value">$64,800</span></div>
+        <div class="pool-row"><span class="label">Recruiting</span><span class="value">$12,000</span></div>
+        <div class="pool-row"><span class="label">Training</span><span class="value">$600</span></div>
+        <div class="pool-row"><span class="label">Software</span><span class="value">$600</span></div>
+        <div class="pool-row"><span class="label">Other OH</span><span class="value">$15,435</span></div>
+        <div class="pool-row"><span class="label">Pool Total</span><span class="value">$93,435</span></div>
+        <div class="pool-row"><span class="label">Base (DL + Fringe)</span><span class="value">$4,661,978</span></div>
+        <div class="pool-row"><span class="label">Rate</span><span class="value">2.00%</span></div>
+      </div>
+      <div class="pool-card">
+        <div class="pool-name">G&A Pool</div>
+        <div class="pool-row"><span class="label">G&A Labor</span><span class="value">$395,850</span></div>
+        <div class="pool-row"><span class="label">Professional Fees</span><span class="value">$48,000</span></div>
+        <div class="pool-row"><span class="label">Software</span><span class="value">$24,000</span></div>
+        <div class="pool-row"><span class="label">Taxes & Licenses</span><span class="value">$13,800</span></div>
+        <div class="pool-row"><span class="label">Other G&A</span><span class="value">$93,721</span></div>
+        <div class="pool-row"><span class="label">Pool Total</span><span class="value">$575,371</span></div>
+        <div class="pool-row"><span class="label">Base (Total Cost)</span><span class="value">$4,793,093</span></div>
+        <div class="pool-row"><span class="label">Rate</span><span class="value">12.00%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- LABOR UTILIZATION -->
+<section class="section">
+  <div class="container">
+    <p class="section-label">Labor Utilization</p>
+    <h2 class="section-title">Every employee. Every hour. Every dollar.</h2>
+    <p class="section-desc">The RPM maps every employee to how their time is charged — direct, overhead, or G&A. This is what drives the indirect rate calculation and determines your true cost structure.</p>
+
+    <div style="overflow-x: auto;">
+      <table class="labor-table">
+        <thead>
+          <tr>
+            <th>Employee / Title</th>
+            <th>Annual Salary</th>
+            <th>Pay Rate</th>
+            <th>Bill Rate</th>
+            <th>Charging</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Davidson, H. · CEO</td><td>$185,000</td><td>$88.94</td><td>—</td><td><span class="charge-badge charge-g">G&A</span></td></tr>
+          <tr><td>Suzuki, T. · Senior Engineer</td><td>$180,000</td><td>$86.54</td><td>$129.81</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Yamaha, K. · Senior DBA</td><td>$180,000</td><td>$86.54</td><td>$129.81</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Ferrari, B. · Project Manager</td><td>$180,000</td><td>$86.54</td><td>$129.81</td><td><span class="charge-badge charge-d">Direct</span> <span class="charge-badge charge-o">OH</span></td></tr>
+          <tr><td>Bugatti, R. · Senior Analyst</td><td>$110,000</td><td>$52.88</td><td>$79.32</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Bentley, P. · Engineer/Scientist</td><td>$110,000</td><td>$52.88</td><td>$79.32</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Mercedes, M. · Software Engineer</td><td>$110,000</td><td>$52.88</td><td>$79.32</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Lotus, F. · Database Specialist</td><td>$110,000</td><td>$52.88</td><td>$79.32</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Delorean, B. · Technical Editor</td><td>$100,000</td><td>$48.08</td><td>$72.12</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Lexus, G. · Software Engineer</td><td>$125,000</td><td>$60.10</td><td>$90.15</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Tesla, N. · Software Engineer</td><td>$125,000</td><td>$60.10</td><td>$90.15</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Porsche, A. · Software Engineer</td><td>$130,000</td><td>$62.50</td><td>$93.75</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Fiat, L. · Software Engineer</td><td>$135,000</td><td>$64.90</td><td>$97.35</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td>Saab, K. · Technician</td><td>$75,000</td><td>$36.06</td><td>$54.09</td><td><span class="charge-badge charge-d">Direct</span></td></tr>
+          <tr><td><strong>Total (16 shown of 29)</strong></td><td><strong>$1,875,000</strong></td><td>—</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem;">Bill rates calculated at 1.50 multiplier · 80.1% labor utilization · 29 total employees · $393,333 monthly payroll</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ERROR MATH -->
+<section class="error-section">
+  <div class="container">
+    <p class="section-label" style="color: var(--teal-light);">Why This Matters</p>
+    <h2 class="section-title">You thought your G&A was 12%. It was actually 15%. That 3-point difference costs $50,000.</h2>
+    <p class="section-desc">On a $2M fixed price contract with 60% direct labor, a G&A rate that's 3 points higher than you thought pushes your wrap rate from 1.50 to 1.54 — and $50,000 in unrecovered indirect costs comes straight out of your profit before you deliver a single hour of work.</p>
+
+    <div class="error-grid">
+      <div class="error-card">
+        <div class="error-label">Contract Value</div>
+        <div class="error-value">$2,000,000</div>
+        <div class="error-sub">Fixed price · 60% direct labor</div>
+      </div>
+      <div class="error-card">
+        <div class="error-label">Intended Fee at 10%</div>
+        <div class="error-value">$200,000</div>
+        <div class="error-sub">What you planned to make</div>
+      </div>
+      <div class="error-card danger">
+        <div class="error-label">Unrecovered Indirect Costs</div>
+        <div class="error-value">$50,000</div>
+        <div class="error-sub">G&A was 15% — not 12% — wrap rate was 1.54 not 1.50</div>
+      </div>
+      <div class="error-card">
+        <div class="error-label">Fee Remaining</div>
+        <div class="error-value">$150,000</div>
+        <div class="error-sub">25% of your intended profit disappeared</div>
+      </div>
+    </div>
+
+    <div class="error-callout">
+      Most contractors can't answer the question "What is your G&A rate?" — and that's exactly the problem. <strong>The rate is running in your business whether you know it or not. The RPM tells you the number before you bid, not after you've already lost the profit.</strong>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <p class="section-label" style="text-align: center;">Your Next Step</p>
+    <h2 class="section-title">Your RPM is a custom build. Not a template.</h2>
+    <p class="section-desc">What you just saw is a demo. Your RPM uses your chart of accounts, your employees, your contracts, and your actual indirect rates — calculated from your real P&L. The result is a model that tells you exactly what to charge on every proposal you submit.</p>
+
+    <a href="https://api.growthhub365.com/widget/booking/yyjbjMWDiEm88eKAaQIP" target="_blank" class="cta-btn">Set Up a Discovery Call →</a>
+
+    <p class="cta-sub">Jenny W. Clark · The GovCon CFO · solvability.com · jenny@solvability.com · 256-882-6276<br>
+    <a href="https://www.linkedin.com/in/solvabilityjwc/" target="_blank" style="color: var(--teal);">LinkedIn: linkedin.com/in/solvabilityjwc</a></p>
+
+    <div class="watermark">
+      © 2026 Solvability · Rate & Pricing Model is proprietary methodology · Demo data is fictional · RPM Demo v2
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p>Solvability · Jenny W. Clark, The GovCon CFO · <a href="https://solvability.com">solvability.com</a> · <a href="mailto:jenny@solvability.com">jenny@solvability.com</a> · 256-882-6276</p>
+  <p style="margin-top: 0.4rem;"><a href="https://www.linkedin.com/in/solvabilityjwc/" target="_blank">linkedin.com/in/solvabilityjwc</a></p>
+  <p style="margin-top: 0.5rem; font-size: 0.75rem;">This demo uses fictional company data. The RPM methodology is proprietary to Solvability. All rights reserved. · RPM Demo v2</p>
+</footer>
+
+</body>
+</html>
